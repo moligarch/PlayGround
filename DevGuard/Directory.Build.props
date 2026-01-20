@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup>
+		<PlatformShortName Condition="'$(Platform)'=='Win32'">x86</PlatformShortName>
+        <PlatformShortName Condition="'$(Platform)'=='x64'">x64</PlatformShortName>
+        <SolutionDir Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
+        <OutDir>$(SolutionDir)build\bin\$(PlatformShortName)\$(Configuration)\</OutDir>
+        <IntDir>$(SolutionDir)build\obj\$(MSBuildProjectName)\$(PlatformShortName)\$(Configuration)\</IntDir>
+    </PropertyGroup>
+	<PropertyGroup>
+		<LLVMInstallDir>$(LLVM_INSTALL_DIR)</LLVMInstallDir>
+		<LLVMToolsVersion>19.1.5</LLVMToolsVersion>
+	</PropertyGroup>
+	<ItemDefinitionGroup>
+		<ClCompile>     
+			<LanguageStandard>stdcpp20</LanguageStandard>
+		</ClCompile>
+	</ItemDefinitionGroup>
+</Project>

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36804.6 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Beep", "Beep\Beep.vcxproj", "{2BE86535-0EFB-42C3-A78D-7A73DF94C300}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2BE86535-0EFB-42C3-A78D-7A73DF94C300}.Debug|x64.ActiveCfg = Debug|x64
+		{2BE86535-0EFB-42C3-A78D-7A73DF94C300}.Debug|x64.Build.0 = Debug|x64
+		{2BE86535-0EFB-42C3-A78D-7A73DF94C300}.Debug|x86.ActiveCfg = Debug|Win32
+		{2BE86535-0EFB-42C3-A78D-7A73DF94C300}.Debug|x86.Build.0 = Debug|Win32
+		{2BE86535-0EFB-42C3-A78D-7A73DF94C300}.Release|x64.ActiveCfg = Release|x64
+		{2BE86535-0EFB-42C3-A78D-7A73DF94C300}.Release|x64.Build.0 = Release|x64
+		{2BE86535-0EFB-42C3-A78D-7A73DF94C300}.Release|x86.ActiveCfg = Release|Win32
+		{2BE86535-0EFB-42C3-A78D-7A73DF94C300}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C33DB0A3-3E17-4190-A660-E3201B69BF3B}
+	EndGlobalSection
+EndGlobal
