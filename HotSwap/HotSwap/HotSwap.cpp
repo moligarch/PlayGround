@@ -7,6 +7,8 @@
 #pragma comment(lib, "version.lib")
 #pragma comment(lib, "user32.lib")
 
+static constexpr char* key{ "SuperSecretKey" };
+
 // Function Pointers for the DLL
 typedef void(__stdcall* FnStart)();
 typedef void(__stdcall* FnStop)();
@@ -154,6 +156,7 @@ int main() {
     std::wstring backuplDll = L"Runner.dll.bak";
     std::wstring copyDll = L"Runner.dll.new";
 
+    std::cout << "--- PHASE 0: Key: " << key << " ---" << std::endl;
     std::cout << "--- PHASE 1: Initial Run (v1) ---" << std::endl;
     RunDllCycle(originalDll);
 
