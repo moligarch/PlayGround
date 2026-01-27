@@ -1,0 +1,14 @@
+# aip-manager/version_includes.yaml
+includes:
+  - key: CyberCore
+    path: installer_src/files/Common/CyberCore.exe
+  - key: UI
+    path: installer_src/files/Common/AgentNotification/AgentNotification.exe
+  - key: CyberRes
+    path: installer_src/files/Packed/CyberRes.dll
+  - key: CyberCommonRules
+    path: installer_src/files/Packed/CyberCommonRules.dll
+  - key: CyberExpert
+    path: installer_src/files/Packed/CyberExpert.dll
+  - key: CyberFilter
+    path: installer_src/files/Packed/CyberFilter.dll

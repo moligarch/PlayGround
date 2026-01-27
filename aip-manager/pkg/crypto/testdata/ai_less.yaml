@@ -1,0 +1,60 @@
+# This file is specifically for testing the encryption workflow.
+# The order of keys and sections here is critical and must not be changed,
+# as it's used to validate a known-good ciphertext.
+encryptionSource: "plaintext"
+buildType: "normal"
+
+modules:
+  HPSP_remove_quarantine_file: false
+  AI_remove_quarantine_file: false
+  RakarL1_remove_quarantine_file: false
+  RakarL2_AM_remove_quarantine_file: true
+  RakarL3_remove_quarantine_file: false
+  HIDS_remove_quarantine_file: false
+  Firewall_remove_quarantine_file: false
+  Blacklist_remove_quarantine_file: true
+  Enable_Dac: false
+
+sts:
+  profiling:
+    enable_profiling: 0
+  general:
+    hide_console: 0
+    event_processor_workers: 3
+    service_accept_value: 0
+    disable_quarantine_file_content_for_ai_tests: 1
+    do_not_remove_quarantined_files: 0
+    enable_dllinjection: 0
+    enable_network_driver: 0
+    enable_self_defense: 1
+    enable_antiransomware: 0
+    quarantine_rakarl2am_malwares: 1
+    quarantine_blacklist_malwares: 1
+    quarantine_rakar_sigmaplus_malwares: 0
+    quarantine_AI_malwares: 0
+    quarantine_signature_malwares: 0
+    last_commit: b75cd650adf06b34a5b09d038ac590b4e04a9bc2
+  events:
+    process_EDRDriver_FileSystem_FileCreate: 0
+    process_EDRDriver_FileSystem_FileOpen: 0
+    process_EDRDriver_FileSystem_FileClose: 1
+    process_EDRDriver_FileSystem_FileDelete: 0
+    process_EDRDriver_FileSystem_FileRead: 0
+    process_EDRDriver_FileSystem_FileWrite: 0
+    process_EDRDriver_FileSystem_FileDataChange: 0
+    process_EDRDriver_FileSystem_FileDataReadFull: 0
+    process_EDRDriver_FileSystem_FileDataWriteFull: 1
+    process_EDRDriver_FileSystem_AntiRansomware: 0
+    process_EDRDriver_Network_Connect: 0
+    process_EDRDriver_Process_CreateProcess: 1
+    process_EDRDriver_Process_DeleteProcess: 1
+    process_EDRDriver_Process_OpenProcess: 1
+    process_EDRDriver_Registry_KeyNameChange: 1
+    process_EDRDriver_Registry_CreateKey: 1
+    process_EDRDriver_Registry_KeyValueSet: 1
+    process_EDRDriver_Registry_DeleteKey: 1
+    process_EDRDriver_Registry_DeleteValue: 1
+    process_EDRDriver_Process_LoadImage: 0
+    process_ETW_Network_ConnectionAttempted: 0
+  directories:
+    only_process_files_in_dir: ""

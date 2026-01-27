@@ -1,0 +1,115 @@
+# =============================================================================
+# GitLab CI for aip-manager (standalone repo, Windows runner)
+#
+# Stages:
+#   1) test     — run all Go tests
+#   2) build    — compile Manager.exe (Windows)
+#   3) update   — EITHER publish to GitLab Generic Package Registry (default)
+#                 OR push Manager.exe into the installer repo
+#
+# How to choose update mode:
+#   - Default: publish to Registry (PUBLISH_MODE=registry)
+#   - Push to installer repo: set PUBLISH_MODE=push and configure *_INSTALLER_* vars
+#
+# Required:
+#   • Windows GitLab Runner (tagged "windows") with Go installed
+#   • This repo uses Go modules (go.mod present)
+#
+# Optional CI/CD Variables (set in GitLab → Settings → CI/CD → Variables):
+#   # Common
+#   PUBLISH_MODE           = registry    # or "push"
+#
+#   # When PUBLISH_MODE=registry (recommended):
+#   #  - We upload Manager.exe to GitLab Generic Packages for THIS project
+#   #  - Other projects (installer) can download with PRIVATE-TOKEN/PAT or CI_JOB_TOKEN
+#   REGISTRY_PACKAGE_NAME  = manager      # path segment in package URL
+#   REGISTRY_VERSION       = $CI_COMMIT_SHORT_SHA  # or a tag value; can override manually
+#   REGISTRY_TOKEN         = <PAT with api scope>  # if not set, CI_JOB_TOKEN is used
+#
+#   # When PUBLISH_MODE=push:
+#   INSTALLER_REPO_URL     = http://oauth2:<TOKEN>@{GITLAB_HOST}/{group}/{installer-repo}.git
+#   INSTALLER_REPO_BRANCH  = main
+#   INSTALLER_TARGET_PATH  = Manager.exe      # path inside installer repo
+#   GIT_PUSH_IDENTITY_NAME  = aip-manager-bot       # optional
+#   GIT_PUSH_IDENTITY_EMAIL = aip-manager-bot@local # optional
+#
+# Download URL (Registry example):
+#   $CI_SERVER_URL/api/v4/projects/$CI_PROJECT_ID/packages/generic/$REGISTRY_PACKAGE_NAME/$REGISTRY_VERSION/Manager.exe
+# =============================================================================
+
+stages: [test, build]
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH'
+      when: always
+    - when: never
+
+variables:
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 1
+  GIT_SUBMODULE_STRATEGY: none
+
+
+.default_windows:
+  tags: [windows]
+  before_script:
+    - '$ErrorActionPreference = "Stop"'
+    - 'go version'
+    - 'git config --global core.autocrlf input'
+
+# ----------------------------------------------------------------------------- 
+# 1) TEST — run all unit tests
+# -----------------------------------------------------------------------------
+test:
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      when: on_success
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: on_success
+    - if: '$CI_COMMIT_TAG'
+      when: on_success
+    - when: never
+  extends: .default_windows
+  script:
+    - gotestsum --junitfile report.xml --format testname
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
+
+# ----------------------------------------------------------------------------- 
+# 2) BUILD — produce Manager.exe
+#   - Builds Windows AMD64 binary
+#   - Artifact is kept for the "update" stage (and also downloadable manually)
+# -----------------------------------------------------------------------------
+build:
+  stage: build
+  extends: .default_windows
+  needs: ["test"]
+  rules:
+    # Merge Requests that TARGET the default branch
+    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH"
+      when: on_success
+    # Any tag pipeline (we’ll guard ancestry in before_script)
+    - if: "$CI_COMMIT_TAG"
+      when: on_success
+    - when: never
+  variables:
+    GOOS: windows
+    GOARCH: amd64
+  script:
+    # Detect module root; if your main.go is in a subfolder, adjust below
+    - if (Test-Path ".\main.go") { $SRC="." } elseif (Test-Path ".\aip-manager\main.go") { $SRC=".\aip-manager" } else { throw "Cannot locate main.go. Adjust build SRC path." }
+    - go build -ldflags "-s -w" -o build/Manager.exe $SRC
+    - Get-Item .\build\Manager.exe | Format-List *
+  artifacts:
+    when: always
+    expire_in: 2 days
+    paths:
+      - build/Manager.exe

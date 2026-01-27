@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" Modules="enterprise" Id="{SAMPLE-GUID}">
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="ProductName" Value="Test Product"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="Test.exe" SourcePath="files\Unpacked\Test.exe"/>
+  </COMPONENT>
+</DOCUMENT>
