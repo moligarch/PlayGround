@@ -1,0 +1,74 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36623.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProHook", "ProHook\ProHook.vcxproj", "{12D121CF-002A-4F66-B713-F031E6EEEA81}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LocalHookDemo", "Examples\LocalHookDemo\LocalHookDemo.vcxproj", "{42802B5E-3F6B-498B-86EC-42444D4BAF3C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RemoteHookDemo", "RemoteHookDemo", "{54F775A4-2B90-4B45-A359-7D6FF367CB8E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProHookPayload", "Examples\RemoteHookDemo\ProHookPayload\ProHookPayload.vcxproj", "{FCF2B988-A07B-4630-B20B-21A7842ED6F0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProHookController", "Examples\RemoteHookDemo\ProHookController\ProHookController.vcxproj", "{BB6919F9-3FE9-480D-AC9B-82A61293897A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0} = {FCF2B988-A07B-4630-B20B-21A7842ED6F0}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12D121CF-002A-4F66-B713-F031E6EEEA81}.Debug|x64.ActiveCfg = Debug|x64
+		{12D121CF-002A-4F66-B713-F031E6EEEA81}.Debug|x64.Build.0 = Debug|x64
+		{12D121CF-002A-4F66-B713-F031E6EEEA81}.Debug|x86.ActiveCfg = Debug|Win32
+		{12D121CF-002A-4F66-B713-F031E6EEEA81}.Debug|x86.Build.0 = Debug|Win32
+		{12D121CF-002A-4F66-B713-F031E6EEEA81}.Release|x64.ActiveCfg = Release|x64
+		{12D121CF-002A-4F66-B713-F031E6EEEA81}.Release|x64.Build.0 = Release|x64
+		{12D121CF-002A-4F66-B713-F031E6EEEA81}.Release|x86.ActiveCfg = Release|Win32
+		{12D121CF-002A-4F66-B713-F031E6EEEA81}.Release|x86.Build.0 = Release|Win32
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C}.Debug|x64.ActiveCfg = Debug|x64
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C}.Debug|x64.Build.0 = Debug|x64
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C}.Debug|x86.ActiveCfg = Debug|Win32
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C}.Debug|x86.Build.0 = Debug|Win32
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C}.Release|x64.ActiveCfg = Release|x64
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C}.Release|x64.Build.0 = Release|x64
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C}.Release|x86.ActiveCfg = Release|Win32
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C}.Release|x86.Build.0 = Release|Win32
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0}.Debug|x64.ActiveCfg = Debug|x64
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0}.Debug|x64.Build.0 = Debug|x64
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0}.Debug|x86.ActiveCfg = Debug|Win32
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0}.Debug|x86.Build.0 = Debug|Win32
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0}.Release|x64.ActiveCfg = Release|x64
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0}.Release|x64.Build.0 = Release|x64
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0}.Release|x86.ActiveCfg = Release|Win32
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0}.Release|x86.Build.0 = Release|Win32
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A}.Debug|x64.ActiveCfg = Debug|x64
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A}.Debug|x64.Build.0 = Debug|x64
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A}.Debug|x86.ActiveCfg = Debug|Win32
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A}.Debug|x86.Build.0 = Debug|Win32
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A}.Release|x64.ActiveCfg = Release|x64
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A}.Release|x64.Build.0 = Release|x64
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A}.Release|x86.ActiveCfg = Release|Win32
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{42802B5E-3F6B-498B-86EC-42444D4BAF3C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{54F775A4-2B90-4B45-A359-7D6FF367CB8E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{FCF2B988-A07B-4630-B20B-21A7842ED6F0} = {54F775A4-2B90-4B45-A359-7D6FF367CB8E}
+		{BB6919F9-3FE9-480D-AC9B-82A61293897A} = {54F775A4-2B90-4B45-A359-7D6FF367CB8E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E7718608-2D20-485C-8165-F510EC39E8B9}
+	EndGlobalSection
+EndGlobal
