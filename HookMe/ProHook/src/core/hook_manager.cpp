@@ -8,7 +8,7 @@
 #include <Windows.h>
 
 #include "ProHook/hooks/i_hook.h"
-#include "core/resolver.h"
+#include "ProHook/utils/resolver.h"
 
 namespace prohook::core {
 
@@ -45,10 +45,10 @@ namespace prohook::core {
             std::wstring w_mod_name(hook.module_name.begin(), hook.module_name.end());
 
             // 1. Get module handle safely
-            void* h_module = core::Resolver::GetSafeModuleHandle(nullptr, w_mod_name);
+            void* h_module = utils::Resolver::GetSafeModuleHandle(nullptr, w_mod_name);
 
             if (!h_module) {
-                h_module = core::Resolver::LocalLoadLibrary(hook.module_name);
+                h_module = utils::Resolver::LocalLoadLibrary(hook.module_name);
             }
 
             if (!h_module) {
@@ -57,7 +57,7 @@ namespace prohook::core {
             }
 
             // 2. Get proc address safely (Local)
-            void* target_addr = core::Resolver::GetSafeProcAddress(nullptr, h_module, hook.function_name);
+            void* target_addr = utils::Resolver::GetSafeProcAddress(nullptr, h_module, hook.function_name);
 
             if (!target_addr) {
                 all_successful = false;

@@ -24,7 +24,7 @@
     <ClInclude Include="include\ProHook\injectors\i_injector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\resolver.h">
+    <ClInclude Include="include\ProHook\utils\resolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ProHook\hooks\detours_hook.h">
@@ -33,9 +33,12 @@
     <ClInclude Include="include\ProHook\injectors\standard_injector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ProHook\utils\win_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\core\resolver.cpp">
+    <ClCompile Include="src\utils\resolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\hook_manager.cpp">
@@ -45,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\injectors\standard_injector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\win_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

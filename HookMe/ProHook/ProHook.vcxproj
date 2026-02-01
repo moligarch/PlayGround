@@ -159,14 +159,16 @@
     <ClInclude Include="include\ProHook\hooks\i_hook.h" />
     <ClInclude Include="include\ProHook\injectors\i_injector.h" />
     <ClInclude Include="include\ProHook\injectors\standard_injector.h" />
-    <ClInclude Include="src\core\resolver.h" />
+    <ClInclude Include="include\ProHook\utils\win_utils.h" />
+    <ClInclude Include="include\ProHook\utils\resolver.h" />
     <ClInclude Include="include\ProHook\hooks\detours_hook.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\hook_manager.cpp" />
-    <ClCompile Include="src\core\resolver.cpp" />
+    <ClCompile Include="src\utils\resolver.cpp" />
     <ClCompile Include="src\hooks\detours_hook.cpp" />
     <ClCompile Include="src\injectors\standard_injector.cpp" />
+    <ClCompile Include="src\utils\win_utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,6 @@
 // Copyright 2026 HookMe Authors.
-#ifndef PROHOOK_SRC_CORE_RESOLVER_H_
-#define PROHOOK_SRC_CORE_RESOLVER_H_
+#ifndef PROHOOK_INCLUDE_UTILS_RESOLVER_H_
+#define PROHOOK_INCLUDE_UTILS_RESOLVER_H_
 
 #include <windows.h>
 #include <winternl.h>
@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace prohook {
-    namespace core {
+    namespace utils {
 
         // Precise definitions based on Geoff Chappell's research
         // This ensures we have the correct offsets regardless of winternl.h
@@ -64,7 +64,7 @@ namespace prohook {
             };
         };
 
-    }  // namespace core
+    }  // namespace utils
 }  // namespace prohook
 
-#endif  // PROHOOK_SRC_CORE_RESOLVER_H_
+#endif  // PROHOOK_INCLUDE_UTILS_RESOLVER_H_

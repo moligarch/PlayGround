@@ -1,10 +1,10 @@
 // Copyright 2026 HookMe Authors.
-#include "core/resolver.h"
+#include "ProHook/utils/resolver.h"
 #include <stddef.h>
 #include <memory>
 
 namespace prohook {
-    namespace core {
+    namespace utils {
 
         // --- Public Interface ---
 
@@ -130,5 +130,5 @@ namespace prohook {
             return nullptr;
         }
 
-    }  // namespace core
+    }  // namespace utils
 }  // namespace prohook
