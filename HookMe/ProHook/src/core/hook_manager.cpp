@@ -36,18 +36,19 @@ namespace prohook::core {
     }
 
     bool HookManager::DeployAll() {
-        if (!provider_) {
-            // In a real EDR, you'd log an error here: "No hook provider assigned."
-            return false;
-        }
+        if (!provider_) return false;
 
         bool all_successful = true;
 
         for (auto& hook : pending_hooks_) {
-            // 1. Use Safe wrapper to get or load the module
-            HMODULE h_module = GetModuleHandleA(hook.module_name.c_str());
+            // Convert string to wstring for the new Resolver interface
+            std::wstring w_mod_name(hook.module_name.begin(), hook.module_name.end());
+
+            // 1. Get module handle safely
+            void* h_module = core::Resolver::GetSafeModuleHandle(nullptr, w_mod_name);
+
             if (!h_module) {
-                h_module = core::Resolver::SafeLoadLibrary(hook.module_name);
+                h_module = core::Resolver::LocalLoadLibrary(hook.module_name);
             }
 
             if (!h_module) {
@@ -55,9 +56,8 @@ namespace prohook::core {
                 continue;
             }
 
-            // 2. Use Safe wrapper to find the export (handles Forwarders & Manual PE parsing)
-            void* target_addr = core::Resolver::SafeGetProcAddress(h_module,
-                hook.function_name);
+            // 2. Get proc address safely (Local)
+            void* target_addr = core::Resolver::GetSafeProcAddress(nullptr, h_module, hook.function_name);
 
             if (!target_addr) {
                 all_successful = false;
@@ -70,10 +70,7 @@ namespace prohook::core {
             }
         }
 
-        // Clear pending hooks after deployment to prevent double-hooking if 
-        // DeployAll is called again.
         pending_hooks_.clear();
-
         return all_successful;
     }
 

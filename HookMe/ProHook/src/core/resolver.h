@@ -2,29 +2,69 @@
 #ifndef PROHOOK_SRC_CORE_RESOLVER_H_
 #define PROHOOK_SRC_CORE_RESOLVER_H_
 
-#include <string>
 #include <windows.h>
+#include <winternl.h>
+#include <string>
+#include <vector>
 
 namespace prohook {
-	namespace core {
+    namespace core {
 
-		class Resolver {
-		public:
-			// High-level wrapper for loading a module.
-			static HMODULE SafeLoadLibrary(const std::string& module_name);
+        // Precise definitions based on Geoff Chappell's research
+        // This ensures we have the correct offsets regardless of winternl.h
+        struct PRO_LDR_DATA_TABLE_ENTRY {
+            LIST_ENTRY InLoadOrderLinks;
+            LIST_ENTRY InMemoryOrderLinks;
+            LIST_ENTRY InInitializationOrderLinks;
+            PVOID DllBase;
+            PVOID EntryPoint;
+            ULONG SizeOfImage;
+            UNICODE_STRING FullDllName;
+            UNICODE_STRING BaseDllName;
+            // ... remaining fields exist but are not needed for resolution
+        };
 
-			// High-level wrapper for getting an export address.
-			static void* SafeGetProcAddress(HMODULE module_base, const std::string& func_name);
+        struct PRO_PEB_LDR_DATA {
+            ULONG Length;
+            BOOLEAN Initialized;
+            HANDLE SsHandle;
+            LIST_ENTRY InLoadOrderModuleList;
+            LIST_ENTRY InMemoryOrderModuleList;
+            LIST_ENTRY InInitializationOrderModuleList;
+        };
 
-			// Internal: The manual PE parser.
-			static void* GetExportAddressInternal(void* module_base, const std::string& func_name);
+        class Resolver {
+        public:
+            // Public Interface: Use NULL for local process, or a valid Handle for remote.
+            static void* GetSafeModuleHandle(HANDLE h_process, const std::wstring& module_name);
+            static void* GetSafeProcAddress(HANDLE h_process, void* module_base, const std::string& func_name);
+            static void* LocalLoadLibrary(const std::string& module_name);
+        private:
+            // Internal logic using templates to support Local vs Remote memory access.
+            template <typename Reader>
+            static void* GetModuleHandleInternal(HANDLE h_process, const std::wstring& module_name);
 
-		private:
-			// Internal: Handles the case where an export points to another DLL.
-			static void* ResolveForwarder(const char* forwarder_str);
-		};
+            template <typename Reader>
+            static void* GetProcAddressInternal(HANDLE h_process, void* module_base, const std::string& func_name);
 
-	}  // namespace core
+            // Memory access policies
+            struct LocalReader {
+                static bool Read(HANDLE, void* addr, void* buffer, size_t size) {
+                    if (!addr) return false;
+                    memcpy(buffer, addr, size);
+                    return true;
+                }
+            };
+
+            struct RemoteReader {
+                static bool Read(HANDLE h_process, void* addr, void* buffer, size_t size) {
+                    SIZE_T bytes_read;
+                    return ReadProcessMemory(h_process, addr, buffer, size, &bytes_read) && bytes_read == size;
+                }
+            };
+        };
+
+    }  // namespace core
 }  // namespace prohook
 
 #endif  // PROHOOK_SRC_CORE_RESOLVER_H_
