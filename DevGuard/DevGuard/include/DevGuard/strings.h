@@ -19,7 +19,7 @@ namespace dvgrd::string {
     //============================================================
     namespace detail {
 
-        constexpr uint64_t hash(const char* s) {
+        consteval uint64_t hash(const char* s) {
             uint64_t h = 1469598103934665603ull;
             while (*s) {
                 h ^= static_cast<unsigned>(*s++);
@@ -28,12 +28,12 @@ namespace dvgrd::string {
             return h;
         }
 
-        constexpr uint64_t base_seed() {
+        consteval uint64_t base_seed() {
             return hash(__TIME__) ^ hash(__DATE__);
         }
 
         template <typename CharT>
-        constexpr CharT narrow(uint64_t v) {
+        consteval CharT narrow(uint64_t v) {
             return static_cast<CharT>(v & ((1ull << (sizeof(CharT) * 8)) - 1));
         }
 
@@ -46,7 +46,7 @@ namespace dvgrd::string {
             static constexpr std::size_t size = N;
             CharT data[N];
 
-            constexpr Literal(const CharT(&str)[N]) {
+            consteval Literal(const CharT(&str)[N]) {
                 for (std::size_t i = 0; i < N; ++i)
                     data[i] = str[i];
             }
@@ -61,7 +61,7 @@ namespace dvgrd::string {
     public:
         using value_type = CharT;
 
-        constexpr explicit SecureString(const CharT(&str)[N])
+        consteval explicit SecureString(const CharT(&str)[N])
             : key_(make_key()) {
             for (std::size_t i = 0; i < N; ++i)
                 data_[i] = str[i] ^ stream(key_, i);
@@ -76,10 +76,10 @@ namespace dvgrd::string {
             return out;
         }
 
-        constexpr std::size_t size() const noexcept { return N; }
+        consteval std::size_t size() const noexcept { return N; }
 
     private:
-        static constexpr CharT make_key() {
+        static consteval CharT make_key() {
             uint64_t k =
                 detail::base_seed()
                 ^ Salt
@@ -95,7 +95,7 @@ namespace dvgrd::string {
         const CharT key_;
     };
 
-#if defined(_MSVC_LANG) && (_MSVC_LANG < 202002L) // C++ >= 20
+#if defined(_MSVC_LANG) && (_MSVC_LANG < 202002L) // C++ < 20
     template <typename CharT, std::size_t N>
     constexpr auto make_obf_raw(const CharT (&str)[N]) {
         constexpr uint64_t salt =
@@ -113,7 +113,7 @@ namespace dvgrd::string {
 #if defined(_MSVC_LANG) && (_MSVC_LANG >= 202002L) // C++ >= 20
 
     template <detail::Literal Str>
-    constexpr auto operator""_enc() {
+    consteval auto operator""_enc() {
         using CharT = typename decltype(Str)::value_type;
         constexpr std::size_t N = decltype(Str)::size; // drop null
         constexpr uint64_t salt =
