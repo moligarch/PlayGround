@@ -67,79 +67,94 @@ func (d *Document) GetProperty(name string) (string, error) {
 	return "", fmt.Errorf("property row with Property='%s' not found", name)
 }
 
-// CommonFileIndex holds a two-tiered map for common files to resolve conflicts.
-type CommonFileIndex struct {
-	bySubdirAndFileName map[string]string
-	byFileName          map[string]string
-}
-
-// FileIndex holds separate maps for each category of source files.
 type FileIndex struct {
-	CommonFiles   *CommonFileIndex
-	PackedFiles   map[string]string
-	UnpackedFiles map[string]string
+	// Map filename to a slice of ALL absolute paths that share that filename
+	CommonFiles   map[string][]string
+	PackedFiles   map[string][]string
+	UnpackedFiles map[string][]string
 }
 
 // buildFileIndex walks the search directories and creates a detailed index of all files.
 func buildFileIndex(baseDir string) (*FileIndex, error) {
 	index := &FileIndex{
-		CommonFiles: &CommonFileIndex{
-			bySubdirAndFileName: make(map[string]string),
-			byFileName:          make(map[string]string),
-		},
-		PackedFiles:   make(map[string]string),
-		UnpackedFiles: make(map[string]string),
+		CommonFiles:   make(map[string][]string),
+		PackedFiles:   make(map[string][]string),
+		UnpackedFiles: make(map[string][]string),
 	}
 
-	// --- Index Common Files ---
-	commonDir := filepath.Join(baseDir, "Common")
-	if _, err := os.Stat(commonDir); !os.IsNotExist(err) {
-		err := filepath.WalkDir(commonDir, func(path string, d fs.DirEntry, err error) error {
+	indexDir := func(dirName string, targetMap map[string][]string) error {
+		targetDir := filepath.Join(baseDir, dirName)
+		if _, err := os.Stat(targetDir); os.IsNotExist(err) {
+			return nil // Skip if directory doesn't exist
+		}
+
+		return filepath.WalkDir(targetDir, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
 			if !d.IsDir() {
 				fileName := d.Name()
-				parentDirName := filepath.Base(filepath.Dir(path))
-
-				// Store by filename as a fallback (e.g., "sqlite3.dll")
-				index.CommonFiles.byFileName[fileName] = path
-
-				// Store by specific key if it's in a subdirectory (e.g., "PhoenixAM/sqlite3.dll")
-				if parentDirName != "Common" {
-					specificKey := filepath.ToSlash(filepath.Join(parentDirName, fileName))
-					index.CommonFiles.bySubdirAndFileName[specificKey] = path
-				}
+				// Append to slice instead of overwriting!
+				targetMap[fileName] = append(targetMap[fileName], filepath.ToSlash(path))
 			}
 			return nil
 		})
-		if err != nil {
-			return nil, err
-		}
 	}
 
-	// --- Index Packed and Unpacked Files ---
-	for _, dirName := range []string{"Packed", "Unpacked"} {
-		targetMap := index.PackedFiles
-		if dirName == "Unpacked" {
-			targetMap = index.UnpackedFiles
-		}
-		dir := filepath.Join(baseDir, dirName)
-		if _, err := os.Stat(dir); !os.IsNotExist(err) {
-			filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
-				if !d.IsDir() {
-					targetMap[d.Name()] = path
-				}
-				return nil
-			})
-		}
+	if err := indexDir("Common", index.CommonFiles); err != nil {
+		return nil, err
+	}
+	if err := indexDir("Packed", index.PackedFiles); err != nil {
+		return nil, err
+	}
+	if err := indexDir("Unpacked", index.UnpackedFiles); err != nil {
+		return nil, err
 	}
 
 	return index, nil
 }
 
-// ResolveSourcePaths intelligently finds files by name and replaces their SourcePath attributes
-// with the correct absolute path based on the specified buildType and subdirectory.
+// findBestMatch finds the physical file path that best matches the directory structure of the AIP path.
+func findBestMatch(aipSourcePath string, availablePaths []string) (string, bool) {
+	if len(availablePaths) == 0 {
+		return "", false
+	}
+	if len(availablePaths) == 1 {
+		return availablePaths[0], true // Only one option, return it immediately
+	}
+
+	aipParts := strings.Split(filepath.ToSlash(aipSourcePath), "/")
+	
+	bestMatch := ""
+	maxScore := -1
+
+	for _, physPath := range availablePaths {
+		physParts := strings.Split(physPath, "/")
+		score := 0
+		
+		// Work backwards checking how many parent directories match
+		aipIdx := len(aipParts) - 1
+		physIdx := len(physParts) - 1
+		
+		for aipIdx >= 0 && physIdx >= 0 {
+			if strings.EqualFold(aipParts[aipIdx], physParts[physIdx]) {
+				score++
+			} else {
+				break
+			}
+			aipIdx--
+			physIdx--
+		}
+
+		if score > maxScore {
+			maxScore = score
+			bestMatch = physPath
+		}
+	}
+	
+	return bestMatch, true
+}
+
 func (d *Document) ResolveSourcePaths(searchDir, buildType string) (int, error) {
 	index, err := buildFileIndex(searchDir)
 	if err != nil {
@@ -157,37 +172,29 @@ func (d *Document) ResolveSourcePaths(searchDir, buildType string) (int, error) 
 					continue
 				}
 
+				aipPath := filepath.ToSlash(row.SourcePath)
+				parts := strings.Split(aipPath, "/")
+				fileName := parts[len(parts)-1]
+
 				var absolutePath string
 				var found bool
 
-				originalPath := filepath.ToSlash(row.SourcePath)
-				parts := strings.Split(originalPath, "/")
-				fileName := parts[len(parts)-1]
+				// 1. Check Packed/Unpacked first based on build type
+				targetMap := index.UnpackedFiles
+				if buildType == "packed" {
+					targetMap = index.PackedFiles
+				}
 
-				// --- NEW PRIORITY-BASED LOOKUP LOGIC ---
-				// 1. Prioritize a specific subdirectory lookup in Common files.
-				if len(parts) > 2 {
-					parentDirName := parts[len(parts)-2]
-					if parentDirName != "Common" && parentDirName != "Packed" && parentDirName != "Unpacked" {
-						lookupKey := filepath.ToSlash(filepath.Join(parentDirName, fileName))
-						absolutePath, found = index.CommonFiles.bySubdirAndFileName[lookupKey]
+				if paths, ok := targetMap[fileName]; ok {
+					absolutePath, found = findBestMatch(aipPath, paths)
+				}
+
+				// 2. Fall back to Common files if not found
+				if !found {
+					if paths, ok := index.CommonFiles[fileName]; ok {
+						absolutePath, found = findBestMatch(aipPath, paths)
 					}
 				}
-
-				// 2. If not found, check Packed or Unpacked based on buildType.
-				if !found {
-					if buildType == "packed" {
-						absolutePath, found = index.PackedFiles[fileName]
-					} else {
-						absolutePath, found = index.UnpackedFiles[fileName]
-					}
-				}
-
-				// 3. If still not found, fall back to a generic search in Common files.
-				if !found {
-					absolutePath, found = index.CommonFiles.byFileName[fileName]
-				}
-				// --- END OF NEW LOGIC ---
 
 				if found {
 					d.Components[i].Rows[j].SourcePath = absolutePath
